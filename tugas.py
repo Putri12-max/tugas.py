@@ -1,10 +1,6 @@
 import datetime
 import pandas as pd
 import streamlit as st
-from streamlit_autorefresh import st_autorefresh
-
-# Menjalankan pembaruan otomatis halaman setiap 1000 ms (1 detik)
-st_autorefresh(interval=1000, key="datetimerefresh")
 
 
 # Fungsi helper untuk mengubah format angka menjadi Rupiah (titik sebagai pemisah ribuan)
@@ -44,10 +40,10 @@ st.write("Jl. Teknologi No 5, Kota Digital, Indonesia")
 st.write("(021) 87654321")
 st.write("---")
 
-# Menampilkan tanggal dan waktu real-time
+# Menampilkan tanggal dan waktu saat ini
 now = datetime.datetime.now()
 waktu_sekarang = now.strftime("%Y-%m-%d %H:%M:%S")
-st.write(f"⏰ **Waktu Sekarang:** {waktu_sekarang}")
+st.write(f"⏰ **Waktu Akses:** {waktu_sekarang}")
 
 # Form isian data pembeli
 nama_pelanggan = st.text_input(
