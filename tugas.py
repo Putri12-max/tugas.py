@@ -3,7 +3,7 @@ import pandas as pd
 import streamlit as st
 
 
-# Fungsi helper untuk mengubah format angka menjadi Rupiah (titik sebagai pemisah ribuan)
+# Fungsi helper untuk format Rupiah dengan pemisah titik
 def rupiah(angka):
   return f"Rp {int(angka):,}".replace(",", ".")
 
@@ -19,7 +19,7 @@ def reset_data():
   st.rerun()
 
 
-# Menyiapkan tempat penyimpanan sementara di web
+# Menyiapkan tempat penyimpanan sementara di web supaya data tidak hilang
 if "input_nama" not in st.session_state:
   st.session_state["input_nama"] = ""
 if "tipe_pesanan" not in st.session_state:
@@ -40,10 +40,10 @@ st.write("Jl. Teknologi No 5, Kota Digital, Indonesia")
 st.write("(021) 87654321")
 st.write("---")
 
-# Menampilkan tanggal dan waktu saat ini (Format 24 Jam: %H akan menampilkan jam 07, dst.)
+# Menampilkan tanggal dan waktu saat ini (menggunakan format waktu awal yang akurat)
 now = datetime.datetime.now()
 waktu_sekarang = now.strftime("%Y-%m-%d %H:%M:%S")
-st.write(f"⏰ **Waktu Akses:** {waktu_sekarang}")
+st.write(waktu_sekarang)
 
 # Form isian data pembeli
 nama_pelanggan = st.text_input(
@@ -175,7 +175,7 @@ if st.button("Simpan"):
 
     st.write("---")
 
-    # Tampilkan tabel Pandas
+    # Tampilkan tabel Pandas tanpa nomor indeks 0 1
     st.write("### Tabel Rincian Pesanan (Pandas DataFrame) ###")
     st.dataframe(df, hide_index=True)
 
