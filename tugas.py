@@ -4,7 +4,7 @@ import streamlit as st
 
 
 def format_rupiah(angka):
-  return f"{int(angka):,}".replace(".", ",")
+  return f"{int(angka):,}".replace(",", ".")
 
 
 def reset_data():
