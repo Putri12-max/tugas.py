@@ -3,190 +3,195 @@ import pandas as pd
 import streamlit as st
 
 
-# Fungsi helper untuk format Rupiah dengan pemisah titik
-def rupiah(angka):
-  return f"Rp {int(angka):,}".replace(",", ".")
+def format_rupiah(angka):
+  return f"{int(angka):,}".replace(".", ",")
 
 
-# Fungsi untuk mengosongkan kembali semua isian data
 def reset_data():
   st.session_state["input_nama"] = ""
-  st.session_state["tipe_pesanan"] = "Dine In"
   st.session_state["metode_pembayaran"] = "Cash"
-  st.session_state["produk_dipilih"] = "Laptop"
+  st.session_state["produk_dipilih"] = "Laptop Gaming ASUS"
   st.session_state["jumlah_produk_key"] = 0
   st.session_state["pesanan"] = []
   st.rerun()
 
 
-# Menyiapkan tempat penyimpanan sementara di web supaya data tidak hilang
 if "input_nama" not in st.session_state:
   st.session_state["input_nama"] = ""
-if "tipe_pesanan" not in st.session_state:
-  st.session_state["tipe_pesanan"] = "Dine In"
 if "metode_pembayaran" not in st.session_state:
   st.session_state["metode_pembayaran"] = "Cash"
 if "produk_dipilih" not in st.session_state:
-  st.session_state["produk_dipilih"] = "Laptop"
+  st.session_state["produk_dipilih"] = "Laptop Gaming ASUS"
 if "jumlah_produk_key" not in st.session_state:
   st.session_state["jumlah_produk_key"] = 0
 if "pesanan" not in st.session_state:
   st.session_state["pesanan"] = []
 
-# Bagian judul dan informasi toko
 st.title("ELECTRONIC GERAI")
-st.subheader("Solusi Cerdas Elektronik Anda")
-st.write("Jl. Teknologi No 5, Kota Digital, Indonesia")
-st.write("(021) 87654321")
+st.subheader("Sistem Kasir Digital Berbasis Web & Analisis Data Penjualan")
+st.markdown(
+    "Selamat datang di portal pelayanan *Electronic Gerai*. Silakan lakukan"
+    " simulasi transaksi di bawah ini."
+)
+st.write("📍 *Jl. Teknologi No. 5, Kota Digital, Indonesia | Telp: (021) 87654321*")
 st.write("---")
 
-# Menampilkan tanggal dan waktu saat ini (menggunakan format waktu awal yang akurat)
-now = datetime.datetime.now()
-waktu_sekarang = now.strftime("%Y-%m-%d %H:%M:%S")
-st.write(waktu_sekarang)
 
-# Form isian data pembeli
+@st.fragment(run_every=1)
+def tampilkan_jam():
+  zona_wib = datetime.timezone(datetime.timedelta(hours=7))
+  waktu_ini = datetime.datetime.now(zona_wib).strftime(
+      "%d-%m-%Y | Pukul %H:%M:%S WIB"
+  )
+  st.info(f"📅 Waktu Sistem Berjalan: **{waktu_ini}**")
+
+
+tampilkan_jam()
+
+zona_wib = datetime.timezone(datetime.timedelta(hours=7))
+waktu_statis = datetime.datetime.now(zona_wib).strftime(
+    "%d-%m-%Y | Pukul %H:%M:%S WIB"
+)
+
+st.markdown("### 👤 Data Pelanggan")
 nama_pelanggan = st.text_input(
-    "Nama Pelanggan",
-    placeholder="Masukkan nama pelanggan...",
+    "Nama Lengkap Pelanggan",
+    placeholder="Silakan masukkan nama pelanggan...",
     key="input_nama",
 )
-tipe_pesanan = st.selectbox(
-    "Tipe Pesanan", ["Dine In", "Take Away"], key="tipe_pesanan"
-)
 metode_pembayaran = st.selectbox(
-    "Metode Pembayaran", ["Cash", "Debit", "E-Wallet"], key="metode_pembayaran"
+    "Pilih Metode Pembayaran yang Digunakan",
+    ["Cash", "Debit", "E-Wallet"],
+    key="metode_pembayaran",
 )
 
 st.write("---")
-st.write("### Rincian Pesanan ###")
+st.markdown("### 🛒 Katalog & Transaksi Produk")
 
-# Pilihan barang yang mau dibeli
 produk_dipilih = st.selectbox(
-    "Pilih Produk",
-    ["Laptop", "Television", "HandPhone", "AC", "Microwave"],
+    "Silakan Pilih Kategori Produk Elektronik",
+    [
+        "Laptop Gaming ASUS",
+        "Smart TV 4K",
+        "Smartphone Pro",
+        "AC Inverter",
+        "Microwave Digital",
+    ],
     key="produk_dipilih",
 )
 
-# Daftar harga barang
 harga_produk_dict = {
-    "Laptop": 5000000,
-    "Television": 7000000,
-    "HandPhone": 3000000,
-    "AC": 10000000,
-    "Microwave": 2000000,
+    "Laptop Gaming ASUS": 12000000,
+    "Smart TV 4K": 6500000,
+    "Smartphone Pro": 5000000,
+    "AC Inverter": 4000000,
+    "Microwave Digital": 1500000,
 }
 
 jumlah_produk = st.number_input(
-    "Masukkan jumlah produk",
+    "Tentukan Kuantitas Pembelian",
     min_value=0,
     max_value=100,
     step=1,
+    format="%d",
     key="jumlah_produk_key",
 )
 
-# Menghitung harga total barang yang sedang dipilih
 subtotal_sekarang = harga_produk_dict[produk_dipilih] * jumlah_produk
-st.write(
-    f"Subtotal untuk {produk_dipilih} ({jumlah_produk} pcs):"
-    f" {rupiah(subtotal_sekarang)}"
+st.success(
+    f"Sub sementara untuk produk **{produk_dipilih}** ({jumlah_produk}"
+    f" unit): **Rp {format_rupiah(subtotal_sekarang)}**"
 )
 
-# Tombol untuk memasukkan barang ke daftar pilihan
-if st.button("Tambah ke Produk Pilihan"):
+if st.button("➕ Masukkan ke Daftar Keranjang Belanja"):
   if jumlah_produk > 0:
     st.session_state.pesanan.append({
         "produk": produk_dipilih,
         "jumlah": jumlah_produk,
         "subtotal": subtotal_sekarang,
     })
+    st.toast("Berhasil menambahkan produk ke keranjang!", icon="✅")
   else:
-    st.warning("Jumlah produk harus lebih dari 0!")
+    st.warning("⚠️ Mohon tentukan kuantitas produk minimal 1 unit.")
 
-# Menampilkan semua daftar barang yang sudah dipilih beserta total harganya
 if st.session_state.pesanan:
   st.write("---")
-  st.write("**Daftar Produk yang Dipilih:**")
+  st.markdown("#### 📋 Rekapitulasi Produk dalam Keranjang:")
   for item in st.session_state.pesanan:
     st.write(
-        f"- {item['produk']} ({item['jumlah']}x) : {rupiah(item['subtotal'])}"
+        f"• **{item['produk']}** sebanyak **{item['jumlah']} unit** — Total: Rp"
+        f" {format_rupiah(item['subtotal'])}"
     )
 
-  # Hitung total semua barang dan potong diskon
   total_belanja = sum(item["subtotal"] for item in st.session_state.pesanan)
-  diskon = 2000
+  diskon = 200000
   grand_total = max(0, total_belanja - diskon)
 
-  st.info(f"Happy Diskon Setiap Bulan: Potongan {rupiah(diskon)} !!!")
-  st.write(f"Total Belanja: {rupiah(total_belanja)}")
-  st.write(f"Diskon: {rupiah(diskon)}")
-  st.markdown(f"### **Grand Total Bayar: {rupiah(grand_total)}**")
+  st.warning(
+      "🎉 **Promo Spesial Toko:** Anda mendapatkan potongan diskon loyalitas"
+      " sebesar **Rp 200.000**!"
+  )
+  st.write(f"• Total Keseluruhan Belanja: Rp {format_rupiah(total_belanja)}")
+  st.write(f"• Potongan Diskon Toko: Rp {format_rupiah(diskon)}")
+  st.markdown(
+      f"### **Grand Total yang Harus Dibayar: Rp"
+      f" {format_rupiah(grand_total)}**"
+  )
 
 st.write("---")
 
-# Tombol untuk menyimpan data, mencetak nota, serta menampilkan grafik
-if st.button("Simpan"):
+if st.button("💾 Proses & Simpan Transaksi"):
   if st.session_state.pesanan:
     df = pd.DataFrame(st.session_state.pesanan)
-
-    # Simpan ke file pesanan.csv
     df.to_csv("pesanan.csv", index=False)
-    st.success(
-        "Data pesanan berhasil disimpan ke file 'pesanan.csv' dan siap"
-        " diolah!"
-    )
+    st.success("📁 Data transaksi berhasil direkam ke file 'pesanan.csv'.")
 
-    # ------------------- TAMPILAN NOTA TRANSAKSI -------------------
-    st.write("### 🧾 NOTA TRANSAKSI BELANJA ###")
-
-    # Membuat kotak bingkai untuk tampilan Nota
+    st.markdown("### 🧾 STRUK NOTA DIGITAL RESMI")
     with st.container(border=True):
-      st.markdown("### **ELECTRONIC GERAI**")
-      st.caption("Jl. Teknologi No 5, Kota Digital | Telp: (021) 87654321")
+      st.markdown("### **ELECTRONIC GERAI OFFICIAL**")
+      st.caption("Pusat Penjualan & Layanan Perangkat Elektronik Terpadu")
       st.write("--------------------------------------------------")
-
-      # Informasi Pembeli & Transaksi
       nama_tampil = (
-          nama_pelanggan if nama_pelanggan != "" else "Pelanggan General"
+          nama_pelanggan if nama_pelanggan.strip() != "" else "Pelanggan Umum"
       )
       col_a, col_b = st.columns(2)
       with col_a:
-        st.write(f"**Waktu** : {waktu_sekarang}")
-        st.write(f"**Pelanggan** : {nama_tampil}")
+        st.write(f"**Waktu Transaksi** : {waktu_statis}")
+        st.write(f"**Nama Konsumen** : {nama_tampil}")
       with col_b:
-        st.write(f"**Tipe Pesanan** : {tipe_pesanan}")
-        st.write(f"**Pembayaran** : {metode_pembayaran}")
+        st.write(f"**Metode Bayar** : {metode_pembayaran}")
+        st.write("**Status Kasir** : Lunas / Terverifikasi")
 
       st.write("--------------------------------------------------")
-      st.write("**Rincian Barang:**")
-
-      # Mencetak daftar barang di Nota
+      st.markdown("**Rincian Pembelian Barang:**")
       for item in st.session_state.pesanan:
         st.write(
-            f"- {item['produk']} x{item['jumlah']} : {rupiah(item['subtotal'])}"
+            f"• {item['produk']} (x{item['jumlah']}) — Rp"
+            f" {format_rupiah(item['subtotal'])}"
         )
 
       st.write("--------------------------------------------------")
-      st.write(f"Total Belanja : {rupiah(total_belanja)}")
-      st.write(f"Diskon : {rupiah(diskon)}")
-      st.markdown(f"### **GRAND TOTAL : {rupiah(grand_total)}**")
+      st.write(f"Subtotal Sebelum Diskon : Rp {format_rupiah(total_belanja)}")
+      st.write(f"Potongan Promo Khusus : Rp {format_rupiah(diskon)}")
+      st.markdown(
+          f"### **GRAND TOTAL PEMBAYARAN : Rp"
+          f" {format_rupiah(grand_total)}**"
+      )
       st.write("--------------------------------------------------")
-      st.caption("~ Terima Kasih Telah Berbelanja di Electronic Gerai ~")
+      st.caption("~ Terima kasih telah berbelanja di Electronic Gerai ~")
 
     st.write("---")
+    st.markdown("### 📊 Tabel Rekapitulasi Data (Pandas DataFrame)")
+    df_tampil = df.copy()
+    df_tampil["subtotal"] = df_tampil["subtotal"].apply(
+        lambda x: f"Rp {format_rupiah(x)}"
+    )
+    st.dataframe(df_tampil, hide_index=True)
 
-    # Tampilkan tabel Pandas tanpa nomor indeks 0 1
-    st.write("### Tabel Rincian Pesanan (Pandas DataFrame) ###")
-    st.dataframe(df, hide_index=True)
-
-    # Tampilkan grafik statistik penjualan
-    st.write("### Grafik Statistik Jumlah Pembelian Produk ###")
+    st.markdown("### 📈 Grafik Analisis Statistik Volume Produk")
     st.bar_chart(df.set_index("produk")[["jumlah"]])
   else:
-    st.warning(
-        "Belum ada produk yang dipilih! Silakan tambahkan produk terlebih"
-        " dahulu sebelum menyimpan."
-    )
+    st.warning("⚠️ Keranjang belanja Anda masih kosong.")
 
-# Tombol untuk mengulang dari awal
-st.button("Clear", on_click=reset_data)
+st.markdown("---")
+st.button("🔄 Bersihkan Formulir & Mulai Transaksi Baru", on_click=reset_data)
