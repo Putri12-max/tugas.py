@@ -40,7 +40,7 @@ st.write("Jl. Teknologi No 5, Kota Digital, Indonesia")
 st.write("(021) 87654321")
 st.write("---")
 
-# Menampilkan tanggal dan waktu saat ini
+# Menampilkan tanggal dan waktu saat ini (Format 24 Jam: %H akan menampilkan jam 07, dst.)
 now = datetime.datetime.now()
 waktu_sekarang = now.strftime("%Y-%m-%d %H:%M:%S")
 st.write(f"⏰ **Waktu Akses:** {waktu_sekarang}")
